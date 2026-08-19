@@ -10,33 +10,91 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AiFinderRouteImport } from './routes/ai-finder'
+import { Route as AiToolsRouteImport } from './routes/ai-tools'
+import { Route as BuilderRouteImport } from './routes/builder'
+import { Route as ProjectsRouteImport } from './routes/projects'
+import { Route as PromptsRouteImport } from './routes/prompts'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiFinderRoute = AiFinderRouteImport.update({
+  id: '/ai-finder',
+  path: '/ai-finder',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiToolsRoute = AiToolsRouteImport.update({
+  id: '/ai-tools',
+  path: '/ai-tools',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BuilderRoute = BuilderRouteImport.update({
+  id: '/builder',
+  path: '/builder',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsRoute = ProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromptsRoute = PromptsRouteImport.update({
+  id: '/prompts',
+  path: '/prompts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-finder': typeof AiFinderRoute
+  '/ai-tools': typeof AiToolsRoute
+  '/builder': typeof BuilderRoute
+  '/projects': typeof ProjectsRoute
+  '/prompts': typeof PromptsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-finder': typeof AiFinderRoute
+  '/ai-tools': typeof AiToolsRoute
+  '/builder': typeof BuilderRoute
+  '/projects': typeof ProjectsRoute
+  '/prompts': typeof PromptsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-finder': typeof AiFinderRoute
+  '/ai-tools': typeof AiToolsRoute
+  '/builder': typeof BuilderRoute
+  '/projects': typeof ProjectsRoute
+  '/prompts': typeof PromptsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/ai-finder' | '/ai-tools' | '/builder' | '/projects' | '/prompts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/ai-finder' | '/ai-tools' | '/builder' | '/projects' | '/prompts'
+  id:
+    | '__root__'
+    | '/'
+    | '/ai-finder'
+    | '/ai-tools'
+    | '/builder'
+    | '/projects'
+    | '/prompts'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiFinderRoute: typeof AiFinderRoute
+  AiToolsRoute: typeof AiToolsRoute
+  BuilderRoute: typeof BuilderRoute
+  ProjectsRoute: typeof ProjectsRoute
+  PromptsRoute: typeof PromptsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +106,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-finder': {
+      id: '/ai-finder'
+      path: '/ai-finder'
+      fullPath: '/ai-finder'
+      preLoaderRoute: typeof AiFinderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai-tools': {
+      id: '/ai-tools'
+      path: '/ai-tools'
+      fullPath: '/ai-tools'
+      preLoaderRoute: typeof AiToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/builder': {
+      id: '/builder'
+      path: '/builder'
+      fullPath: '/builder'
+      preLoaderRoute: typeof BuilderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects': {
+      id: '/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prompts': {
+      id: '/prompts'
+      path: '/prompts'
+      fullPath: '/prompts'
+      preLoaderRoute: typeof PromptsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiFinderRoute: AiFinderRoute,
+  AiToolsRoute: AiToolsRoute,
+  BuilderRoute: BuilderRoute,
+  ProjectsRoute: ProjectsRoute,
+  PromptsRoute: PromptsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
