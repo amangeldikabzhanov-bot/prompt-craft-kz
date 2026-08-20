@@ -18,7 +18,7 @@ export function ToolCard({
       rel="noreferrer noopener"
       style={{ animationDelay: `${Math.min(index, 12) * 55}ms` }}
       className={cn(
-        "animate-rise surface-card group relative flex flex-col overflow-hidden rounded-3xl p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-glow)]",
+        "animate-rise surface-card card-interactive group relative flex flex-col overflow-hidden rounded-3xl p-5",
         className,
       )}
     >
