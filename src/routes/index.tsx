@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NAV_ITEMS } from "@/components/Navbar";
 import { TOOLS } from "@/data/tools";
 import { ToolCard } from "@/components/ToolCard";
+import { AiCore } from "@/components/AiCore";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,14 +40,23 @@ function Index() {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
       {/* Hero */}
-      <section className="relative grid items-center gap-10 py-14 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
-        <div className="animate-rise min-w-0">
+      <section className="relative grid items-center gap-10 overflow-x-clip py-14 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
+        {/* Animated gradient glow + radial light behind the headline */}
+        <div
+          aria-hidden
+          className="animate-aurora pointer-events-none absolute -top-10 -left-24 h-[26rem] w-[34rem] rounded-full bg-[image:var(--gradient-primary)] opacity-25 blur-[120px]"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 -top-24 h-[30rem] [background:radial-gradient(60%_50%_at_35%_35%,color-mix(in_oklab,var(--primary-glow)_14%,transparent),transparent_70%)]"
+        />
+        <div className="animate-rise relative min-w-0">
           <span className="glass inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium text-primary-glow">
             <span className="animate-pulse-glow h-1.5 w-1.5 rounded-full bg-primary" />
             Қазақ тіліндегі AI платформасы
           </span>
 
-          <h1 className="mt-5 text-4xl leading-[1.05] font-bold text-balance sm:text-5xl lg:text-6xl">
+          <h1 className="mt-5 text-[2.6rem] leading-[1.03] font-bold tracking-[-0.03em] text-balance sm:text-6xl lg:text-7xl">
             Идеяңды жаз — <span className="text-gradient">AI жобаңды жасасын.</span>
           </h1>
 
@@ -56,12 +66,12 @@ function Index() {
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button asChild variant="hero" size="xl">
+            <Button asChild variant="hero" size="xl" className="press">
               <Link to="/builder">
                 Builder-ді бастау <ArrowRight />
               </Link>
             </Button>
-            <Button asChild variant="glass" size="xl">
+            <Button asChild variant="glass" size="xl" className="press">
               <Link to="/ai-tools">AI құралдарын көру</Link>
             </Button>
           </div>
@@ -80,14 +90,9 @@ function Index() {
           </dl>
         </div>
 
-        {/* Animated AI orb */}
-        <div className="relative mx-auto aspect-square w-full max-w-md">
-          <div className="animate-pulse-glow absolute inset-8 rounded-full bg-[image:var(--gradient-primary)] opacity-30 blur-[70px]" />
-          <div className="animate-spin-slow absolute inset-4 rounded-full border border-primary/25" />
-          <div className="animate-spin-slow absolute inset-12 rounded-full border border-violet/25 [animation-direction:reverse]" />
-          <div className="animate-float glass absolute inset-20 grid place-items-center rounded-full">
-            <Sparkles className="size-12 text-primary-glow" />
-          </div>
+        {/* Animated AI core */}
+        <div className="animate-fade-in relative mx-auto aspect-square w-full max-w-sm sm:max-w-md">
+          <AiCore state="idle" size="full" className="absolute inset-0" />
           <div className="animate-float glass absolute top-6 right-2 rounded-2xl px-3 py-2 text-xs [animation-delay:-3s]">
             <span className="text-primary-glow">◆</span> Сайт жасау
           </div>
@@ -105,7 +110,7 @@ function Index() {
               key={item.to}
               to={item.to}
               style={{ animationDelay: `${i * 60}ms` }}
-              className="animate-rise surface-card group flex flex-col gap-3 rounded-3xl p-4 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-glow)]"
+              className="animate-rise surface-card card-interactive group flex flex-col gap-3 rounded-3xl p-4"
             >
               <span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary-glow transition-colors group-hover:bg-primary/20">
                 <item.icon className="size-5" />
@@ -162,7 +167,7 @@ function Index() {
           <p className="relative mx-auto mt-3 max-w-xl text-sm text-muted-foreground sm:text-base">
             Бір сөйлем жаз — Builder қалғанын өзі жасайды.
           </p>
-          <Button asChild variant="hero" size="xl" className="relative mt-7">
+          <Button asChild variant="hero" size="xl" className="press relative mt-7">
             <Link to="/builder">
               Builder-ді бастау <ArrowRight />
             </Link>

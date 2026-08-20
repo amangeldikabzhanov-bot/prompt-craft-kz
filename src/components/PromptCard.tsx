@@ -32,7 +32,7 @@ export function PromptCard({
   return (
     <article
       style={{ animationDelay: `${Math.min(index, 12) * 55}ms` }}
-      className="animate-rise surface-card group flex flex-col rounded-3xl p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-glow)]"
+      className="animate-rise surface-card card-interactive group flex flex-col rounded-3xl p-5"
     >
       <div className="flex items-start justify-between gap-3">
         <h3 className="min-w-0 text-base font-semibold">{prompt.title}</h3>
@@ -48,7 +48,7 @@ export function PromptCard({
       </p>
 
       <div className="mt-5 flex items-center gap-2">
-        <Button size="sm" variant="glass" className="flex-1" onClick={copy}>
+        <Button size="sm" variant="glass" className="press flex-1" onClick={copy}>
           {copied ? <Check className="text-success" /> : <Copy />}
           {copied ? "Көшірілді" : "Көшіру"}
         </Button>
@@ -57,7 +57,7 @@ export function PromptCard({
           variant="ghost"
           aria-label="Сақтау"
           onClick={() => onToggleSave(prompt.id)}
-          className={cn("px-3", saved && "text-primary-glow")}
+          className={cn("press px-3 transition-transform duration-300", saved && "scale-110 text-primary-glow")}
         >
           {saved ? <BookmarkCheck /> : <Bookmark />}
         </Button>

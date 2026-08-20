@@ -28,7 +28,7 @@ export function ProjectCard({ project, index = 0 }: { project: Project; index?: 
   return (
     <article
       style={{ animationDelay: `${Math.min(index, 12) * 55}ms` }}
-      className="animate-rise surface-card group rounded-3xl p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-[var(--shadow-glow)]"
+      className="animate-rise surface-card card-interactive group rounded-3xl p-5"
     >
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
         <div className="min-w-0">

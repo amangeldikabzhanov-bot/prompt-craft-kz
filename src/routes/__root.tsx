@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { GlowBackground } from "@/components/GlowBackground";
 import { Navbar, MobileTabBar } from "@/components/Navbar";
 import { Toaster } from "@/components/ui/sonner";
+import { PageTransition } from "@/components/PageTransition";
 
 function NotFoundComponent() {
   return (
@@ -125,9 +126,11 @@ function RootComponent() {
       <GlowBackground />
       <div className="flex min-h-screen flex-col">
         <Navbar />
-        <main className="animate-fade-in flex-1 pb-24 md:pb-12">
+        <main className="flex-1 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] md:pb-12">
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
         </main>
         <MobileTabBar />
       </div>

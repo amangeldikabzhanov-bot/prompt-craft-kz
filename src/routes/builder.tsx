@@ -4,6 +4,7 @@ import { ArrowRight, Check, Sparkles, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ThinkingDots, SkeletonBlock } from "@/components/LoadingState";
+import { AiCore } from "@/components/AiCore";
 import { createProjectFromPrompt } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +38,14 @@ const STAGES = [
   "Дизайн жүйесін таңдау",
   "Беттерді жинау",
   "Соңғы тексеру",
+];
+
+const STATUS_TEXT = [
+  "Идеяны талдап жатырмын…",
+  "Жоба құрылымын дайындап жатырмын…",
+  "Дизайн жүйесін таңдап жатырмын…",
+  "Интерфейсті құрып жатырмын…",
+  "Соңғы тексеруді жасап жатырмын…",
 ];
 
 function BuilderPage() {
@@ -79,7 +88,8 @@ function BuilderPage() {
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-16">
       <div className="animate-rise text-center">
-        <span className="glass inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium text-primary-glow">
+        <AiCore state={generating ? "thinking" : done ? "success" : "idle"} size="md" className="mx-auto" />
+        <span className="glass mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium text-primary-glow">
           <Sparkles className="size-3.5" /> VibeCoding Builder
         </span>
         <h1 className="mt-5 text-3xl leading-tight font-bold text-balance sm:text-5xl">
@@ -109,7 +119,7 @@ function BuilderPage() {
           >
             {prompt.length} / {MAX}
           </span>
-          <Button variant="hero" size="lg" onClick={generate} disabled={generating}>
+          <Button variant="hero" size="lg" className="press" onClick={generate} disabled={generating}>
             <Wand2 />
             {generating ? "Жасалуда..." : "Генерациялау"}
           </Button>
@@ -139,13 +149,25 @@ function BuilderPage() {
         <div className="animate-rise surface-card mt-8 rounded-4xl p-5 sm:p-7">
           {!done ? (
             <>
-              <ThinkingDots label="AI ойлануда..." />
-              <ul className="mt-5 space-y-2.5">
+              <div className="flex flex-col items-center gap-4 text-center">
+                <AiCore state="thinking" size="md" />
+                <p className="font-display text-lg font-semibold text-balance">
+                  {STATUS_TEXT[Math.min(stage, STATUS_TEXT.length - 1)]}
+                </p>
+                <ThinkingDots />
+                <div className="h-1.5 w-full max-w-sm overflow-hidden rounded-full bg-surface-2">
+                  <div
+                    className="h-full rounded-full bg-[image:var(--gradient-primary)] transition-[width] duration-700 ease-out"
+                    style={{ width: `${((stage + 1) / (STAGES.length + 1)) * 100}%` }}
+                  />
+                </div>
+              </div>
+              <ul className="mt-6 space-y-2.5">
                 {STAGES.map((s, i) => (
                   <li key={s} className="flex items-center gap-3 text-sm">
                     <span
                       className={cn(
-                        "grid size-5 shrink-0 place-items-center rounded-full border text-[10px]",
+                        "grid size-5 shrink-0 place-items-center rounded-full border text-[10px] transition-all duration-500",
                         i < stage
                           ? "border-success/40 bg-success/15 text-success"
                           : i === stage
@@ -155,7 +177,12 @@ function BuilderPage() {
                     >
                       {i < stage ? <Check className="size-3" /> : i + 1}
                     </span>
-                    <span className={i <= stage ? "text-foreground" : "text-muted-foreground"}>
+                    <span
+                      className={cn(
+                        "transition-colors duration-500",
+                        i <= stage ? "text-foreground" : "text-muted-foreground",
+                      )}
+                    >
                       {s}
                     </span>
                   </li>
@@ -170,11 +197,12 @@ function BuilderPage() {
                 </div>
               </div>
             </>
+
           ) : (
             <>
               <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                 <div className="min-w-0">
-                  <p className="inline-flex items-center gap-2 text-xs text-success">
+                  <p className="animate-fade-in inline-flex items-center gap-2 text-xs text-success">
                     <Check className="size-4" /> Дайын
                   </p>
                   <h2 className="mt-1 truncate text-lg font-semibold">{projectName}</h2>
