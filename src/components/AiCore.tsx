@@ -8,6 +8,7 @@ const SIZES = {
   md: "size-40",
   lg: "size-64",
   xl: "size-80",
+  full: "h-full w-full",
 } as const;
 
 /**
@@ -73,7 +74,7 @@ export function AiCore({
       <div
         className={cn(
           "glass relative grid place-items-center rounded-full transition-all duration-500",
-          size === "sm" ? "size-11" : size === "md" ? "size-18" : "size-28",
+          size === "sm" ? "size-11" : size === "md" ? "size-18" : "size-24 sm:size-28",
           active && "shadow-[var(--shadow-glow)]",
           success && "animate-success-pop shadow-[var(--shadow-glow)]",
         )}
@@ -81,7 +82,7 @@ export function AiCore({
         <Sparkles
           className={cn(
             "text-primary-glow transition-all duration-500",
-            size === "sm" ? "size-5" : size === "md" ? "size-7" : "size-11",
+            size === "sm" ? "size-5" : size === "md" ? "size-7" : "size-10 sm:size-11",
             active && "animate-pulse-glow",
             success && "text-success",
           )}

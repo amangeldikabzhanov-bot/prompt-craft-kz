@@ -92,7 +92,7 @@ function Index() {
 
         {/* Animated AI core */}
         <div className="animate-fade-in relative mx-auto aspect-square w-full max-w-sm sm:max-w-md">
-          <AiCore state="idle" size="xl" className="absolute inset-0 !size-full" />
+          <AiCore state="idle" size="full" className="absolute inset-0" />
           <div className="animate-float glass absolute top-6 right-2 rounded-2xl px-3 py-2 text-xs [animation-delay:-3s]">
             <span className="text-primary-glow">◆</span> Сайт жасау
           </div>
