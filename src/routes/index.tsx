@@ -40,7 +40,7 @@ function Index() {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
       {/* Hero */}
-      <section className="relative grid items-center gap-10 py-14 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
+      <section className="relative grid items-center gap-10 overflow-x-clip py-14 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:py-24">
         {/* Animated gradient glow + radial light behind the headline */}
         <div
           aria-hidden
