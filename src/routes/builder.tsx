@@ -139,13 +139,25 @@ function BuilderPage() {
         <div className="animate-rise surface-card mt-8 rounded-4xl p-5 sm:p-7">
           {!done ? (
             <>
-              <ThinkingDots label="AI ойлануда..." />
-              <ul className="mt-5 space-y-2.5">
+              <div className="flex flex-col items-center gap-4 text-center">
+                <AiCore state="thinking" size="md" />
+                <p className="font-display text-lg font-semibold text-balance">
+                  {STATUS_TEXT[Math.min(stage, STATUS_TEXT.length - 1)]}
+                </p>
+                <ThinkingDots />
+                <div className="h-1.5 w-full max-w-sm overflow-hidden rounded-full bg-surface-2">
+                  <div
+                    className="h-full rounded-full bg-[image:var(--gradient-primary)] transition-[width] duration-700 ease-out"
+                    style={{ width: `${((stage + 1) / (STAGES.length + 1)) * 100}%` }}
+                  />
+                </div>
+              </div>
+              <ul className="mt-6 space-y-2.5">
                 {STAGES.map((s, i) => (
                   <li key={s} className="flex items-center gap-3 text-sm">
                     <span
                       className={cn(
-                        "grid size-5 shrink-0 place-items-center rounded-full border text-[10px]",
+                        "grid size-5 shrink-0 place-items-center rounded-full border text-[10px] transition-all duration-500",
                         i < stage
                           ? "border-success/40 bg-success/15 text-success"
                           : i === stage
@@ -155,7 +167,12 @@ function BuilderPage() {
                     >
                       {i < stage ? <Check className="size-3" /> : i + 1}
                     </span>
-                    <span className={i <= stage ? "text-foreground" : "text-muted-foreground"}>
+                    <span
+                      className={cn(
+                        "transition-colors duration-500",
+                        i <= stage ? "text-foreground" : "text-muted-foreground",
+                      )}
+                    >
                       {s}
                     </span>
                   </li>
@@ -170,6 +187,7 @@ function BuilderPage() {
                 </div>
               </div>
             </>
+
           ) : (
             <>
               <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
