@@ -4,6 +4,7 @@ import { ArrowRight, Check, Sparkles, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ThinkingDots, SkeletonBlock } from "@/components/LoadingState";
+import { AiCore } from "@/components/AiCore";
 import { createProjectFromPrompt } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +38,14 @@ const STAGES = [
   "Дизайн жүйесін таңдау",
   "Беттерді жинау",
   "Соңғы тексеру",
+];
+
+const STATUS_TEXT = [
+  "Идеяны талдап жатырмын…",
+  "Жоба құрылымын дайындап жатырмын…",
+  "Дизайн жүйесін таңдап жатырмын…",
+  "Интерфейсті құрып жатырмын…",
+  "Соңғы тексеруді жасап жатырмын…",
 ];
 
 function BuilderPage() {
@@ -79,7 +88,8 @@ function BuilderPage() {
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-16">
       <div className="animate-rise text-center">
-        <span className="glass inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium text-primary-glow">
+        <AiCore state={generating ? "thinking" : done ? "success" : "idle"} size="md" className="mx-auto" />
+        <span className="glass mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium text-primary-glow">
           <Sparkles className="size-3.5" /> VibeCoding Builder
         </span>
         <h1 className="mt-5 text-3xl leading-tight font-bold text-balance sm:text-5xl">
@@ -109,7 +119,7 @@ function BuilderPage() {
           >
             {prompt.length} / {MAX}
           </span>
-          <Button variant="hero" size="lg" onClick={generate} disabled={generating}>
+          <Button variant="hero" size="lg" className="press" onClick={generate} disabled={generating}>
             <Wand2 />
             {generating ? "Жасалуда..." : "Генерациялау"}
           </Button>
@@ -192,7 +202,7 @@ function BuilderPage() {
             <>
               <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
                 <div className="min-w-0">
-                  <p className="inline-flex items-center gap-2 text-xs text-success">
+                  <p className="animate-fade-in inline-flex items-center gap-2 text-xs text-success">
                     <Check className="size-4" /> Дайын
                   </p>
                   <h2 className="mt-1 truncate text-lg font-semibold">{projectName}</h2>
