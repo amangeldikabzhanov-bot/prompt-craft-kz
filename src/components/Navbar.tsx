@@ -107,6 +107,8 @@ export function Navbar() {
             ))}
           </div>
 
+          <div className="flex shrink-0 items-center gap-2">
+          <AccountLink />
           <Link
             to="/builder"
             className="press group relative shrink-0 overflow-hidden rounded-xl bg-[image:var(--gradient-primary)] px-4 py-2 text-sm font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
@@ -116,6 +118,7 @@ export function Navbar() {
               Builder-ді бастау
             </span>
           </Link>
+          </div>
         </nav>
       </header>
 
@@ -130,12 +133,15 @@ export function Navbar() {
               Vibe<span className="text-gradient">Coding</span> KZ
             </span>
           </Link>
-          <Link
-            to="/builder"
-            className="press shrink-0 rounded-lg border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary-glow"
-          >
-            Builder
-          </Link>
+          <div className="flex shrink-0 items-center gap-2">
+            <AccountLink compact />
+            <Link
+              to="/builder"
+              className="press shrink-0 rounded-lg border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary-glow"
+            >
+              Builder
+            </Link>
+          </div>
         </div>
       </header>
     </>
