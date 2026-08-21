@@ -13,8 +13,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AiFinderRouteImport } from './routes/ai-finder'
 import { Route as AiToolsRouteImport } from './routes/ai-tools'
 import { Route as BuilderRouteImport } from './routes/builder'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as PromptsRouteImport } from './routes/prompts'
+import { Route as SignupRouteImport } from './routes/signup'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -36,6 +39,16 @@ const BuilderRoute = BuilderRouteImport.update({
   path: '/builder',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectsRoute = ProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
@@ -46,22 +59,33 @@ const PromptsRoute = PromptsRouteImport.update({
   path: '/prompts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ai-finder': typeof AiFinderRoute
   '/ai-tools': typeof AiToolsRoute
   '/builder': typeof BuilderRoute
+  '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/projects': typeof ProjectsRoute
   '/prompts': typeof PromptsRoute
+  '/signup': typeof SignupRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ai-finder': typeof AiFinderRoute
   '/ai-tools': typeof AiToolsRoute
   '/builder': typeof BuilderRoute
+  '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/projects': typeof ProjectsRoute
   '/prompts': typeof PromptsRoute
+  '/signup': typeof SignupRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,23 +93,46 @@ export interface FileRoutesById {
   '/ai-finder': typeof AiFinderRoute
   '/ai-tools': typeof AiToolsRoute
   '/builder': typeof BuilderRoute
+  '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/projects': typeof ProjectsRoute
   '/prompts': typeof PromptsRoute
+  '/signup': typeof SignupRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/ai-finder' | '/ai-tools' | '/builder' | '/projects' | '/prompts'
+    | '/'
+    | '/ai-finder'
+    | '/ai-tools'
+    | '/builder'
+    | '/login'
+    | '/profile'
+    | '/projects'
+    | '/prompts'
+    | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/ai-finder' | '/ai-tools' | '/builder' | '/projects' | '/prompts'
+  to:
+    | '/'
+    | '/ai-finder'
+    | '/ai-tools'
+    | '/builder'
+    | '/login'
+    | '/profile'
+    | '/projects'
+    | '/prompts'
+    | '/signup'
   id:
     | '__root__'
     | '/'
     | '/ai-finder'
     | '/ai-tools'
     | '/builder'
+    | '/login'
+    | '/profile'
     | '/projects'
     | '/prompts'
+    | '/signup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -93,8 +140,11 @@ export interface RootRouteChildren {
   AiFinderRoute: typeof AiFinderRoute
   AiToolsRoute: typeof AiToolsRoute
   BuilderRoute: typeof BuilderRoute
+  LoginRoute: typeof LoginRoute
+  ProfileRoute: typeof ProfileRoute
   ProjectsRoute: typeof ProjectsRoute
   PromptsRoute: typeof PromptsRoute
+  SignupRoute: typeof SignupRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -127,6 +177,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BuilderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projects': {
       id: '/projects'
       path: '/projects'
@@ -141,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PromptsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -149,8 +220,11 @@ const rootRouteChildren: RootRouteChildren = {
   AiFinderRoute: AiFinderRoute,
   AiToolsRoute: AiToolsRoute,
   BuilderRoute: BuilderRoute,
+  LoginRoute: LoginRoute,
+  ProfileRoute: ProfileRoute,
   ProjectsRoute: ProjectsRoute,
   PromptsRoute: PromptsRoute,
+  SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

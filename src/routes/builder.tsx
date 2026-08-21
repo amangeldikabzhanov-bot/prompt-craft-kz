@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ThinkingDots, SkeletonBlock } from "@/components/LoadingState";
 import { AiCore } from "@/components/AiCore";
 import { createProjectFromPrompt } from "@/lib/projects";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/builder")({
@@ -54,6 +55,7 @@ function BuilderPage() {
   const [done, setDone] = useState(false);
   const [projectName, setProjectName] = useState("");
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const { user } = useAuth();
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
@@ -71,11 +73,17 @@ function BuilderPage() {
       setTimeout(
         () => {
           if (i === STAGES.length - 1) {
-            const project = createProjectFromPrompt(prompt);
-            setProjectName(project.name);
-            setDone(true);
-            setStage(STAGES.length);
-            toast.success("Жоба дайын — Projects бөлімінен қара");
+            void createProjectFromPrompt(prompt, user?.id ?? null).then((project) => {
+              setProjectName(project.name);
+              setDone(true);
+              setStage(STAGES.length);
+              toast.success(
+                user
+                  ? "Жоба дайын — Projects бөлімінен қара"
+                  : "Жоба дайын. Сақтау үшін аккаунтқа кір.",
+              );
+            });
+
           } else {
             setStage(i + 1);
           }

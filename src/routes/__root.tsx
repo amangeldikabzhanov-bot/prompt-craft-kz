@@ -15,6 +15,7 @@ import { GlowBackground } from "@/components/GlowBackground";
 import { Navbar, MobileTabBar } from "@/components/Navbar";
 import { Toaster } from "@/components/ui/sonner";
 import { PageTransition } from "@/components/PageTransition";
+import { AuthProvider } from "@/hooks/useAuth";
 
 function NotFoundComponent() {
   return (
@@ -123,6 +124,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AuthProvider>
       <GlowBackground />
       <div className="flex min-h-screen flex-col">
         <Navbar />
@@ -135,6 +137,7 @@ function RootComponent() {
         <MobileTabBar />
       </div>
       <Toaster position="top-center" />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
