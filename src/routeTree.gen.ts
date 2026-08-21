@@ -14,6 +14,7 @@ import { Route as AiFinderRouteImport } from './routes/ai-finder'
 import { Route as AiToolsRouteImport } from './routes/ai-tools'
 import { Route as BuilderRouteImport } from './routes/builder'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as PromptsRouteImport } from './routes/prompts'
 import { Route as SignupRouteImport } from './routes/signup'
@@ -43,6 +44,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectsRoute = ProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/ai-tools': typeof AiToolsRoute
   '/builder': typeof BuilderRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/projects': typeof ProjectsRoute
   '/prompts': typeof PromptsRoute
   '/signup': typeof SignupRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/ai-tools': typeof AiToolsRoute
   '/builder': typeof BuilderRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/projects': typeof ProjectsRoute
   '/prompts': typeof PromptsRoute
   '/signup': typeof SignupRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/ai-tools': typeof AiToolsRoute
   '/builder': typeof BuilderRoute
   '/login': typeof LoginRoute
+  '/profile': typeof ProfileRoute
   '/projects': typeof ProjectsRoute
   '/prompts': typeof PromptsRoute
   '/signup': typeof SignupRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/ai-tools'
     | '/builder'
     | '/login'
+    | '/profile'
     | '/projects'
     | '/prompts'
     | '/signup'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/ai-tools'
     | '/builder'
     | '/login'
+    | '/profile'
     | '/projects'
     | '/prompts'
     | '/signup'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/ai-tools'
     | '/builder'
     | '/login'
+    | '/profile'
     | '/projects'
     | '/prompts'
     | '/signup'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   AiToolsRoute: typeof AiToolsRoute
   BuilderRoute: typeof BuilderRoute
   LoginRoute: typeof LoginRoute
+  ProfileRoute: typeof ProfileRoute
   ProjectsRoute: typeof ProjectsRoute
   PromptsRoute: typeof PromptsRoute
   SignupRoute: typeof SignupRoute
@@ -171,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projects': {
       id: '/projects'
       path: '/projects'
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiToolsRoute: AiToolsRoute,
   BuilderRoute: BuilderRoute,
   LoginRoute: LoginRoute,
+  ProfileRoute: ProfileRoute,
   ProjectsRoute: ProjectsRoute,
   PromptsRoute: PromptsRoute,
   SignupRoute: SignupRoute,

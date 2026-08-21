@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Project, ProjectStatus } from "@/components/ProjectCard";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const STORAGE_KEY = "vibecoding-kz:projects";
 
@@ -40,26 +42,96 @@ function write(projects: Project[]) {
   }
 }
 
-/** Client-side project store. Swap the read/write layer for Lovable Cloud later. */
+function formatUpdated(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const day = 86_400_000;
+  if (diff < 60_000) return "Жаңа ғана";
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)} мин бұрын`;
+  if (diff < day) return "Бүгін";
+  return `${Math.floor(diff / day)} күн бұрын`;
+}
+
+interface ProjectRow {
+  id: string;
+  name: string;
+  description: string | null;
+  status: string;
+  progress: number;
+  updated_at: string;
+}
+
+function fromRow(row: ProjectRow): Project {
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description ?? "",
+    status: (["draft", "building", "ready"].includes(row.status) ? row.status : "draft") as ProjectStatus,
+    updatedAt: formatUpdated(row.updated_at),
+    progress: row.progress,
+  };
+}
+
+/** Projects store: Lovable Cloud for signed-in users, local storage for guests. */
 export function useProjects() {
+  const { user, loading: authLoading } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setProjects(read());
-      setLoading(false);
-    }, 450);
-    return () => clearTimeout(timer);
-  }, []);
+    if (authLoading) return;
+    let active = true;
+    setLoading(true);
+    setError(null);
 
-  const persist = useCallback((next: Project[]) => {
-    setProjects(next);
-    write(next);
-  }, []);
+    if (!user) {
+      const timer = setTimeout(() => {
+        if (!active) return;
+        setProjects(read());
+        setLoading(false);
+      }, 300);
+      return () => {
+        active = false;
+        clearTimeout(timer);
+      };
+    }
+
+    void supabase
+      .from("projects")
+      .select("id, name, description, status, progress, updated_at")
+      .order("updated_at", { ascending: false })
+      .then(({ data, error: err }) => {
+        if (!active) return;
+        if (err) setError("Жобалар жүктелмеді.");
+        else setProjects(((data ?? []) as ProjectRow[]).map(fromRow));
+        setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [user, authLoading]);
 
   const addProject = useCallback(
-    (input: { name: string; description: string; status?: ProjectStatus; progress?: number }) => {
+    async (input: { name: string; description: string; status?: ProjectStatus; progress?: number }) => {
+      if (user) {
+        const { data, error: err } = await supabase
+          .from("projects")
+          .insert({
+            user_id: user.id,
+            name: input.name,
+            description: input.description,
+            status: input.status ?? "draft",
+            progress: input.progress ?? 10,
+          })
+          .select("id, name, description, status, progress, updated_at")
+          .single();
+        if (err || !data) throw new Error("Жоба сақталмады.");
+        const project = fromRow(data as ProjectRow);
+        setProjects((prev) => [project, ...prev]);
+        return project;
+      }
+
       const project: Project = {
         id: `p-${Date.now()}`,
         name: input.name,
@@ -75,27 +147,36 @@ export function useProjects() {
       });
       return project;
     },
-    [],
+    [user],
   );
 
-  const clearAll = useCallback(() => persist([]), [persist]);
-
-  return { projects, loading, addProject, clearAll };
+  return { projects, loading, error, addProject, isAuthed: Boolean(user) };
 }
 
-export function createProjectFromPrompt(prompt: string) {
+/** Creates a project from a Builder prompt. Persists to Cloud when signed in. */
+export async function createProjectFromPrompt(prompt: string, userId?: string | null) {
   const name = prompt.trim().split(/[.\n]/)[0]?.slice(0, 46) || "Жаңа AI жоба";
+  const description = prompt.trim().slice(0, 140);
+
+  if (userId) {
+    const { data, error } = await supabase
+      .from("projects")
+      .insert({ user_id: userId, name, description, status: "building", progress: 45 })
+      .select("id, name, description, status, progress, updated_at")
+      .single();
+    if (!error && data) return fromRow(data as ProjectRow);
+  }
+
   const project: Project = {
     id: `p-${Date.now()}`,
     name,
-    description: prompt.trim().slice(0, 140),
+    description,
     status: "building",
     updatedAt: "Жаңа ғана",
     progress: 45,
   };
   if (typeof window !== "undefined") {
-    const next = [project, ...read()];
-    write(next);
+    write([project, ...read()]);
   }
   return project;
 }
