@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AiFinderRouteImport } from './routes/ai-finder'
 import { Route as AiToolsRouteImport } from './routes/ai-tools'
 import { Route as BuilderRouteImport } from './routes/builder'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as PromptsRouteImport } from './routes/prompts'
 
@@ -36,6 +37,11 @@ const BuilderRoute = BuilderRouteImport.update({
   path: '/builder',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectsRoute = ProjectsRouteImport.update({
   id: '/projects',
   path: '/projects',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/ai-finder': typeof AiFinderRoute
   '/ai-tools': typeof AiToolsRoute
   '/builder': typeof BuilderRoute
+  '/login': typeof LoginRoute
   '/projects': typeof ProjectsRoute
   '/prompts': typeof PromptsRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/ai-finder': typeof AiFinderRoute
   '/ai-tools': typeof AiToolsRoute
   '/builder': typeof BuilderRoute
+  '/login': typeof LoginRoute
   '/projects': typeof ProjectsRoute
   '/prompts': typeof PromptsRoute
 }
@@ -69,21 +77,36 @@ export interface FileRoutesById {
   '/ai-finder': typeof AiFinderRoute
   '/ai-tools': typeof AiToolsRoute
   '/builder': typeof BuilderRoute
+  '/login': typeof LoginRoute
   '/projects': typeof ProjectsRoute
   '/prompts': typeof PromptsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/ai-finder' | '/ai-tools' | '/builder' | '/projects' | '/prompts'
+    | '/'
+    | '/ai-finder'
+    | '/ai-tools'
+    | '/builder'
+    | '/login'
+    | '/projects'
+    | '/prompts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/ai-finder' | '/ai-tools' | '/builder' | '/projects' | '/prompts'
+  to:
+    | '/'
+    | '/ai-finder'
+    | '/ai-tools'
+    | '/builder'
+    | '/login'
+    | '/projects'
+    | '/prompts'
   id:
     | '__root__'
     | '/'
     | '/ai-finder'
     | '/ai-tools'
     | '/builder'
+    | '/login'
     | '/projects'
     | '/prompts'
   fileRoutesById: FileRoutesById
@@ -93,6 +116,7 @@ export interface RootRouteChildren {
   AiFinderRoute: typeof AiFinderRoute
   AiToolsRoute: typeof AiToolsRoute
   BuilderRoute: typeof BuilderRoute
+  LoginRoute: typeof LoginRoute
   ProjectsRoute: typeof ProjectsRoute
   PromptsRoute: typeof PromptsRoute
 }
@@ -127,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BuilderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/projects': {
       id: '/projects'
       path: '/projects'
@@ -149,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiFinderRoute: AiFinderRoute,
   AiToolsRoute: AiToolsRoute,
   BuilderRoute: BuilderRoute,
+  LoginRoute: LoginRoute,
   ProjectsRoute: ProjectsRoute,
   PromptsRoute: PromptsRoute,
 }
