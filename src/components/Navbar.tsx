@@ -1,6 +1,45 @@
 import { Link } from "@tanstack/react-router";
-import { Blocks, Compass, LayoutGrid, Sparkles, Terminal } from "lucide-react";
+import { Blocks, Compass, LayoutGrid, LogIn, Sparkles, Terminal } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+
+function AccountLink({ compact = false }: { compact?: boolean }) {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <span className="size-9 shrink-0 animate-pulse rounded-xl bg-surface/60" />;
+  }
+
+  if (!user) {
+    return (
+      <Link
+        to="/login"
+        className={
+          "press flex shrink-0 items-center gap-1.5 rounded-xl border border-border bg-surface/50 font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground " +
+          (compact ? "px-2.5 py-1.5 text-xs" : "px-3.5 py-2 text-sm")
+        }
+      >
+        <LogIn className={compact ? "size-3.5" : "size-4"} />
+        Кіру
+      </Link>
+    );
+  }
+
+  const initial = (user.email ?? "?").charAt(0).toUpperCase();
+  return (
+    <Link
+      to="/profile"
+      aria-label="Профиль"
+      className={
+        "press grid shrink-0 place-items-center rounded-xl border border-primary/40 bg-primary/10 font-semibold text-primary-glow transition-all duration-300 hover:shadow-[var(--shadow-glow)] " +
+        (compact ? "size-8 text-xs" : "size-9 text-sm")
+      }
+    >
+      {initial}
+    </Link>
+  );
+}
+
 
 export interface NavItem {
   to: string;
