@@ -71,11 +71,17 @@ function BuilderPage() {
       setTimeout(
         () => {
           if (i === STAGES.length - 1) {
-            const project = createProjectFromPrompt(prompt);
-            setProjectName(project.name);
-            setDone(true);
-            setStage(STAGES.length);
-            toast.success("Жоба дайын — Projects бөлімінен қара");
+            void createProjectFromPrompt(prompt, user?.id ?? null).then((project) => {
+              setProjectName(project.name);
+              setDone(true);
+              setStage(STAGES.length);
+              toast.success(
+                user
+                  ? "Жоба дайын — Projects бөлімінен қара"
+                  : "Жоба дайын. Сақтау үшін аккаунтқа кір.",
+              );
+            });
+
           } else {
             setStage(i + 1);
           }
