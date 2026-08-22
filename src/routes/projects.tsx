@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useProjects } from "@/lib/projects";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/projects")({
   head: () => ({
@@ -35,21 +36,33 @@ export const Route = createFileRoute("/projects")({
 });
 
 function ProjectsPage() {
-  const { projects, loading, addProject } = useProjects();
+  const { projects, loading, error, addProject, isAuthed } = useProjects();
+  const { loading: authLoading } = useAuth();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  const submit = () => {
+  const submit = async () => {
     if (!name.trim()) {
       toast.error("Жоба атауын жаз");
       return;
     }
-    addProject({ name: name.trim(), description: description.trim() || "Сипаттама әлі жоқ." });
-    toast.success("Жоба құрылды");
-    setName("");
-    setDescription("");
-    setOpen(false);
+    setSaving(true);
+    try {
+      await addProject({
+        name: name.trim(),
+        description: description.trim() || "Сипаттама әлі жоқ.",
+      });
+      toast.success(isAuthed ? "Жоба сақталды" : "Жоба құрылды (тек осы құрылғыда)");
+      setName("");
+      setDescription("");
+      setOpen(false);
+    } catch {
+      toast.error("Жоба сақталмады. Қайта көр.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -65,7 +78,32 @@ function ProjectsPage() {
         }
       />
 
-      {loading ? (
+      {!authLoading && !isAuthed ? (
+        <div className="surface-card animate-rise mb-6 flex flex-col gap-3 rounded-3xl p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold">Жобаларың тек осы құрылғыда сақталады.</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Аккаунтқа кірсең — жобаларың бұлтта сақталып, кез келген жерден қолжетімді болады.
+            </p>
+          </div>
+          <div className="flex shrink-0 gap-2">
+            <Button asChild variant="hero">
+              <Link to="/login" search={{ redirect: "/projects" }}>Кіру</Link>
+            </Button>
+            <Button asChild variant="glass">
+              <Link to="/signup" search={{ redirect: "/projects" }}>Тіркелу</Link>
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
+      {error ? (
+        <p className="mb-4 rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+          {error}
+        </p>
+      ) : null}
+
+      {loading || authLoading ? (
         <LoadingState count={3} />
       ) : projects.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -124,8 +162,8 @@ function ProjectsPage() {
             <Button variant="ghost" onClick={() => setOpen(false)}>
               Болдырмау
             </Button>
-            <Button variant="hero" onClick={submit}>
-              Құру
+            <Button variant="hero" onClick={() => void submit()} disabled={saving}>
+              {saving ? "Сақталуда..." : "Құру"}
             </Button>
           </DialogFooter>
         </DialogContent>
