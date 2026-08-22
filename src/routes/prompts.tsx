@@ -1,5 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { PageHeader } from "@/components/PageHeader";
 import { SearchInput } from "@/components/SearchInput";
 import { PromptCard } from "@/components/PromptCard";
@@ -25,9 +28,46 @@ function PromptsPage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<PromptCategory | "all">("all");
   const [saved, setSaved] = useState<string[]>([]);
+  const { user } = useAuth();
 
-  const toggleSave = (id: string) =>
-    setSaved((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]));
+  useEffect(() => {
+    if (!user) {
+      setSaved([]);
+      return;
+    }
+    let active = true;
+    void supabase
+      .from("saved_prompts")
+      .select("prompt_id")
+      .then(({ data, error }) => {
+        if (!active) return;
+        if (error) toast.error("Сақталған промпттар жүктелмеді.");
+        else setSaved((data ?? []).map((r) => r.prompt_id));
+      });
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  const toggleSave = (id: string) => {
+    const wasSaved = saved.includes(id);
+    setSaved((prev) => (wasSaved ? prev.filter((p) => p !== id) : [...prev, id]));
+
+    if (!user) {
+      if (!wasSaved) toast("Тұрақты сақтау үшін аккаунтқа кір.");
+      return;
+    }
+
+    void (async () => {
+      const { error } = wasSaved
+        ? await supabase.from("saved_prompts").delete().eq("prompt_id", id).eq("user_id", user.id)
+        : await supabase.from("saved_prompts").insert({ user_id: user.id, prompt_id: id });
+      if (error) {
+        setSaved((prev) => (wasSaved ? [...prev, id] : prev.filter((p) => p !== id)));
+        toast.error("Сақталмады. Қайта көр.");
+      }
+    })();
+  };
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
