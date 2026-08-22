@@ -44,21 +44,22 @@ function ProfilePage() {
     if (!user) return;
     let active = true;
     setDbLoading(true);
-    supabase
-      .from("profiles")
-      .select("display_name, email, created_at")
-      .eq("id", user.id)
-      .maybeSingle()
-      .then(({ data, error }) => {
-        if (!active) return;
-        if (error) setDbError("Профиль жүктелмеді.");
-        else setProfile(data as ProfileRow | null);
-        setDbLoading(false);
-      });
+    void (async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("display_name, email, created_at")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (!active) return;
+      if (error) setDbError("Профиль жүктелмеді.");
+      else setProfile(data as ProfileRow | null);
+      setDbLoading(false);
+    })();
     return () => {
       active = false;
     };
   }, [user]);
+
 
   if (loading || !user) {
     return (
