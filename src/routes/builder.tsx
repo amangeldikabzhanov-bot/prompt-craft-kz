@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, Check, Sparkles, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ThinkingDots, SkeletonBlock } from "@/components/LoadingState";
 import { AiCore } from "@/components/AiCore";
 import { createProjectFromPrompt } from "@/lib/projects";
+import { planAiTask } from "@/lib/ai-engine.functions";
+import type { AiTaskPlan } from "@/lib/ai-engine/types";
+import { AiEngineStatus, type EnginePhase } from "@/components/AiEngineStatus";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
@@ -56,6 +60,10 @@ function BuilderPage() {
   const [projectName, setProjectName] = useState("");
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const { user } = useAuth();
+  const [phase, setPhase] = useState<EnginePhase>("idle");
+  const [plan, setPlan] = useState<AiTaskPlan | null>(null);
+  const [engineError, setEngineError] = useState<string | null>(null);
+  const requestPlan = useServerFn(planAiTask);
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
@@ -68,6 +76,27 @@ function BuilderPage() {
     }
     setDone(false);
     setStage(0);
+    setPlan(null);
+    setEngineError(null);
+    setPhase("analyzing");
+    timers.current.push(setTimeout(() => setPhase((p) => (p === "analyzing" ? "planning" : p)), 700));
+
+    void requestPlan({ data: { prompt: prompt.trim(), maxCredits: 100 } })
+      .then((res) => {
+        if (res.ok) {
+          setPlan(res.plan);
+          setPhase("selecting");
+          timers.current.push(setTimeout(() => setPhase("ready"), 600));
+        } else {
+          setEngineError(res.message);
+          setPhase("error");
+        }
+      })
+      .catch(() => {
+        setEngineError("AI Engine-ге қосыла алмадым.");
+        setPhase("error");
+      });
+
     timers.current.forEach(clearTimeout);
     timers.current = STAGES.map((_, i) =>
       setTimeout(
@@ -151,6 +180,8 @@ function BuilderPage() {
           ))}
         </div>
       </div>
+
+      <AiEngineStatus phase={phase} plan={plan} error={engineError} className="mt-6" />
 
       {/* Generation state / preview */}
       {stage >= 0 && (
