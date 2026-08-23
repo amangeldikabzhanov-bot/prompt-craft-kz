@@ -74,10 +74,10 @@ export interface AiProviderDescriptor {
 }
 
 export interface AiProjectContext {
-  projectId?: string | null;
-  projectName?: string | null;
-  description?: string | null;
-  status?: string | null;
+  projectId?: string | null | undefined;
+  projectName?: string | null | undefined;
+  description?: string | null | undefined;
+  status?: string | null | undefined;
 }
 
 export interface AiPlanStep {
