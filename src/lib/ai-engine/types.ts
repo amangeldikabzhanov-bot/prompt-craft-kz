@@ -124,3 +124,40 @@ export const DEFAULT_MAX_CREDITS = 100;
 export const MAX_ALLOWED_CREDITS = 10_000;
 export const MIN_PROMPT_LENGTH = 10;
 export const MAX_PROMPT_LENGTH = 2_000;
+
+/** Typed error codes returned by the engine's execution surface. */
+export const AI_ERROR_CODES = [
+  "provider_not_configured",
+  "unauthorized",
+  "invalid_input",
+  "budget_exceeded",
+  "provider_unavailable",
+  "provider_timeout",
+  "provider_error",
+  "rate_limited",
+  "internal",
+] as const;
+export type AiErrorCode = (typeof AI_ERROR_CODES)[number];
+
+export interface AiGeneratedProject {
+  name: string;
+  description: string;
+  pages: string[];
+  features: string[];
+  techNotes: string;
+}
+
+export interface AiExecutionResult {
+  taskId: string;
+  state: AiTaskState;
+  providerId: string;
+  providerLabel: string;
+  primaryTaskType: AiTaskType;
+  budget: AiCreditBudget;
+  usedCredits: number;
+  project: AiGeneratedProject;
+  events: AiActivityEvent[];
+  warnings: string[];
+}
+
+export const EXECUTION_TIMEOUT_MS = 60_000;

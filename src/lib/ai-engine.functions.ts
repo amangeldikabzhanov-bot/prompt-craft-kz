@@ -2,12 +2,16 @@
 // Provider credentials never leave the server and are not part of any payload.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   AI_TASK_TYPES,
   DEFAULT_MAX_CREDITS,
   MAX_ALLOWED_CREDITS,
   MAX_PROMPT_LENGTH,
   MIN_PROMPT_LENGTH,
+  type AiActivityEvent,
+  type AiErrorCode,
+  type AiExecutionResult,
   type AiTaskPlan,
 } from "./ai-engine/types";
 
@@ -48,6 +52,40 @@ export const planAiTask = createServerFn({ method: "POST" })
         return { ok: false, code: error.code, message: error.message };
       }
       console.error("[ai-engine] plan failed", error);
+      return { ok: false, code: "internal", message: "AI Engine қатесі. Кейінірек қайталап көр." };
+    }
+  });
+
+const executeInput = planInput;
+
+export type ExecuteAiTaskResult =
+  | { ok: true; result: AiExecutionResult }
+  | { ok: false; code: AiErrorCode; message: string; events?: AiActivityEvent[] };
+
+/** Authenticated: plan → budget check → real provider execution → structured result. */
+export const executeAiTask = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => executeInput.parse(input))
+  .handler(async ({ data }): Promise<ExecuteAiTaskResult> => {
+    const { createTaskPlan, AiEngineError } = await import("./ai-engine/orchestrator.server");
+    const { executePlan, AiExecutionError } = await import("./ai-engine/executor.server");
+    try {
+      const plan = createTaskPlan({
+        prompt: data.prompt,
+        maxCredits: data.maxCredits ?? DEFAULT_MAX_CREDITS,
+        taskTypeHint: data.taskTypeHint ?? null,
+        projectContext: data.projectContext ?? null,
+      });
+      const result = await executePlan({ prompt: data.prompt, plan });
+      return { ok: true, result };
+    } catch (error) {
+      if (error instanceof AiExecutionError) {
+        return { ok: false, code: error.code, message: error.message, events: error.events };
+      }
+      if (error instanceof AiEngineError) {
+        return { ok: false, code: "invalid_input", message: error.message };
+      }
+      console.error("[ai-engine] execute failed");
       return { ok: false, code: "internal", message: "AI Engine қатесі. Кейінірек қайталап көр." };
     }
   });

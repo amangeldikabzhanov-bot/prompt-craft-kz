@@ -10,6 +10,9 @@ import { createProjectFromPrompt } from "@/lib/projects";
 import { planAiTask } from "@/lib/ai-engine.functions";
 import type { AiTaskPlan } from "@/lib/ai-engine/types";
 import { AiEngineStatus, type EnginePhase } from "@/components/AiEngineStatus";
+import { AiExecutionPanel, type ExecPhase } from "@/components/AiExecutionPanel";
+import { executeAiTask } from "@/lib/ai-engine.functions";
+import type { AiExecutionResult } from "@/lib/ai-engine/types";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
@@ -64,6 +67,11 @@ function BuilderPage() {
   const [plan, setPlan] = useState<AiTaskPlan | null>(null);
   const [engineError, setEngineError] = useState<string | null>(null);
   const requestPlan = useServerFn(planAiTask);
+  const runTask = useServerFn(executeAiTask);
+  const [execState, setExecState] = useState<ExecPhase>("idle");
+  const [execResult, setExecResult] = useState<AiExecutionResult | null>(null);
+  const [execError, setExecError] = useState<string | null>(null);
+  const [execBudget, setExecBudget] = useState<{ estimated: number; max: number } | null>(null);
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
@@ -78,6 +86,10 @@ function BuilderPage() {
     setStage(0);
     setPlan(null);
     setEngineError(null);
+    setExecResult(null);
+    setExecError(null);
+    setExecBudget(null);
+    setExecState(user ? "planning" : "idle");
     setPhase("analyzing");
     timers.current.push(setTimeout(() => setPhase((p) => (p === "analyzing" ? "planning" : p)), 700));
 
@@ -87,6 +99,31 @@ function BuilderPage() {
           setPlan(res.plan);
           setPhase("selecting");
           timers.current.push(setTimeout(() => setPhase("ready"), 600));
+          setExecBudget({
+            estimated: res.plan.budget.estimatedCredits,
+            max: res.plan.budget.maxCredits,
+          });
+          if (!user) return;
+          if (!res.plan.budget.withinBudget) {
+            setExecState("failed");
+            setExecError("Болжамды шығын бюджеттен асады — орындау тоқтатылды.");
+            return;
+          }
+          setExecState("running");
+          void runTask({ data: { prompt: prompt.trim(), maxCredits: 100 } })
+            .then((exec) => {
+              if (exec.ok) {
+                setExecResult(exec.result);
+                setExecState("completed");
+              } else {
+                setExecError(exec.message);
+                setExecState("failed");
+              }
+            })
+            .catch(() => {
+              setExecError("Провайдерге қосыла алмадым.");
+              setExecState("failed");
+            });
         } else {
           setEngineError(res.message);
           setPhase("error");
@@ -182,6 +219,15 @@ function BuilderPage() {
       </div>
 
       <AiEngineStatus phase={phase} plan={plan} error={engineError} className="mt-6" />
+
+      <AiExecutionPanel
+        state={execState}
+        estimatedCredits={execBudget?.estimated ?? null}
+        maxCredits={execBudget?.max ?? null}
+        result={execResult}
+        error={execError}
+        className="mt-4"
+      />
 
       {/* Generation state / preview */}
       {stage >= 0 && (
