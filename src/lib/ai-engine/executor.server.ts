@@ -42,6 +42,7 @@ const SYSTEM_PROMPT = [
   "Жауап тек қазақ тілінде. 4-7 бет, 4-8 функция. Қысқа әрі нақты жаз.",
   "techNotes — 1-2 сөйлем техникалық ұсыныс.",
   "Ешқашан код орындама, тек құрылым сипатта.",
+  "JSON-да тек мына өрістер болсын: name, description, pages, features, techNotes.",
 ].join(" ");
 
 function statusToError(status: number): { code: AiErrorCode; message: string } {
