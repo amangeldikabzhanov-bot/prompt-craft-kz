@@ -57,6 +57,37 @@ function statusToError(status: number): { code: AiErrorCode; message: string } {
   return { code: "provider_error", message: "Провайдер сұранысты орындай алмады." };
 }
 
+function toStringList(value: unknown, max: number, len: number): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((v) => (typeof v === "string" ? v : typeof v === "object" && v ? String((v as Record<string, unknown>)["name"] ?? "") : ""))
+    .filter(Boolean)
+    .slice(0, max)
+    .map((v) => v.slice(0, len));
+}
+
+function normalize(value: unknown): AiGeneratedProject {
+  const o = (value ?? {}) as Record<string, unknown>;
+  return {
+    name: String(o["name"] ?? "AI жоба").slice(0, 120),
+    description: String(o["description"] ?? "").slice(0, 400),
+    pages: toStringList(o["pages"], 8, 80),
+    features: toStringList(o["features"], 10, 100),
+    techNotes: String(o["techNotes"] ?? "").slice(0, 400),
+  };
+}
+
+function parseFallback(text: string | undefined): unknown {
+  if (!text) return null;
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) return null;
+  try {
+    return JSON.parse(match[0]);
+  } catch {
+    return null;
+  }
+}
+
 export async function executePlan(params: {
   prompt: string;
   plan: AiTaskPlan;
@@ -95,6 +126,7 @@ export async function executePlan(params: {
 
   const gateway = createLovableAiGatewayProvider(apiKey);
   const controller = new AbortController();
+  // Generous ceiling only — never an aggressive client-side deadline.
   const timeout = setTimeout(() => controller.abort(), EXECUTION_TIMEOUT_MS);
 
   try {
@@ -108,14 +140,16 @@ export async function executePlan(params: {
       maxRetries: 1,
     });
 
-    const output = (await result.output) as AiGeneratedProject;
-    const project: AiGeneratedProject = {
-      name: output.name.slice(0, 120),
-      description: output.description.slice(0, 400),
-      pages: output.pages.slice(0, 8).map((p) => p.slice(0, 80)),
-      features: output.features.slice(0, 10).map((f) => f.slice(0, 100)),
-      techNotes: output.techNotes.slice(0, 400),
-    };
+    let output: unknown;
+    try {
+      output = await result.output;
+    } catch (error) {
+      if (!NoObjectGeneratedError.isInstance(error)) throw error;
+      output = parseFallback(error.text);
+      if (!output) throw error;
+    }
+    const parsed = normalize(output);
+    const project: AiGeneratedProject = parsed;
 
     log.add("generation_completed", "Генерация аяқталды", { pages: project.pages.length });
     log.add("validation_started", "Нәтиже тексерілуде");

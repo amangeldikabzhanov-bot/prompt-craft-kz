@@ -160,4 +160,4 @@ export interface AiExecutionResult {
   warnings: string[];
 }
 
-export const EXECUTION_TIMEOUT_MS = 60_000;
+export const EXECUTION_TIMEOUT_MS = 300_000;
