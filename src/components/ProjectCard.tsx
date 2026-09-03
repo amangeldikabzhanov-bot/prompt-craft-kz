@@ -1,7 +1,16 @@
-import { Clock, MoreHorizontal } from "lucide-react";
+import { ArrowRight, Clock, MoreHorizontal } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 
 export type ProjectStatus = "draft" | "building" | "ready";
+
+export interface ProjectBlueprint {
+  name: string;
+  description: string;
+  pages: string[];
+  features: string[];
+  techNotes: string;
+}
 
 export interface Project {
   id: string;
@@ -10,7 +19,11 @@ export interface Project {
   status: ProjectStatus;
   updatedAt: string;
   progress: number;
+  createdAtLabel?: string;
+  updatedAtLabel?: string;
+  blueprint?: ProjectBlueprint | null;
 }
+
 
 const STATUS_LABEL: Record<ProjectStatus, string> = {
   draft: "Жоба (draft)",
@@ -71,6 +84,14 @@ export function ProjectCard({ project, index = 0 }: { project: Project; index?: 
           />
         </div>
       </div>
+
+      <Link
+        to="/projects/$projectId"
+        params={{ projectId: project.id }}
+        className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface/50 px-3 py-1.5 text-xs font-medium transition-colors hover:border-primary/50 hover:text-primary-glow"
+      >
+        Ашу <ArrowRight className="size-3.5" />
+      </Link>
     </article>
   );
 }
