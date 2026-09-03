@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { Project, ProjectStatus } from "@/components/ProjectCard";
+import type { Project, ProjectBlueprint, ProjectStatus } from "@/components/ProjectCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -58,6 +58,33 @@ interface ProjectRow {
   status: string;
   progress: number;
   updated_at: string;
+  created_at?: string;
+  blueprint?: unknown;
+}
+
+const ROW_COLUMNS = "id, name, description, status, progress, updated_at, created_at, blueprint";
+
+function formatDate(iso?: string) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleDateString("kk-KZ", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+function toBlueprint(value: unknown): ProjectBlueprint | null {
+  if (!value || typeof value !== "object") return null;
+  const v = value as Record<string, unknown>;
+  return {
+    name: typeof v['name'] === "string" ? v['name'] : "",
+    description: typeof v['description'] === "string" ? v['description'] : "",
+    pages: Array.isArray(v['pages']) ? (v['pages'] as unknown[]).filter((p): p is string => typeof p === "string") : [],
+    features: Array.isArray(v['features'])
+      ? (v['features'] as unknown[]).filter((p): p is string => typeof p === "string")
+      : [],
+    techNotes: typeof v['techNotes'] === "string" ? v['techNotes'] : "",
+  };
 }
 
 function fromRow(row: ProjectRow): Project {
@@ -68,8 +95,12 @@ function fromRow(row: ProjectRow): Project {
     status: (["draft", "building", "ready"].includes(row.status) ? row.status : "draft") as ProjectStatus,
     updatedAt: formatUpdated(row.updated_at),
     progress: row.progress,
+    createdAtLabel: formatDate(row.created_at),
+    updatedAtLabel: formatDate(row.updated_at),
+    blueprint: toBlueprint(row.blueprint),
   };
 }
+
 
 /** Projects store: Lovable Cloud for signed-in users, local storage for guests. */
 export function useProjects() {
@@ -98,7 +129,7 @@ export function useProjects() {
 
     void supabase
       .from("projects")
-      .select("id, name, description, status, progress, updated_at")
+      .select(ROW_COLUMNS)
       .order("updated_at", { ascending: false })
       .then(({ data, error: err }) => {
         if (!active) return;
@@ -124,7 +155,7 @@ export function useProjects() {
             status: input.status ?? "draft",
             progress: input.progress ?? 10,
           })
-          .select("id, name, description, status, progress, updated_at")
+          .select(ROW_COLUMNS)
           .single();
         if (err || !data) throw new Error("Жоба сақталмады.");
         const project = fromRow(data as ProjectRow);
@@ -162,7 +193,7 @@ export async function createProjectFromPrompt(prompt: string, userId?: string | 
     const { data, error } = await supabase
       .from("projects")
       .insert({ user_id: userId, name, description, status: "building", progress: 45 })
-      .select("id, name, description, status, progress, updated_at")
+      .select(ROW_COLUMNS)
       .single();
     if (!error && data) return fromRow(data as ProjectRow);
   }
@@ -179,4 +210,72 @@ export async function createProjectFromPrompt(prompt: string, userId?: string | 
     write([project, ...read()]);
   }
   return project;
+}
+
+/** Persists an AI blueprint as a real project for the signed-in user. */
+export async function createProjectFromBlueprint(
+  userId: string,
+  blueprint: ProjectBlueprint,
+  prompt: string,
+): Promise<Project> {
+  const name = blueprint.name.trim() || prompt.trim().split(/[.\n]/)[0]?.slice(0, 46) || "Жаңа AI жоба";
+  const description = blueprint.description.trim() || prompt.trim().slice(0, 140);
+
+  const { data, error } = await supabase
+    .from("projects")
+    .insert({
+      user_id: userId,
+      name: name.slice(0, 120),
+      description,
+      status: "ready",
+      progress: 100,
+      blueprint: { ...blueprint, prompt },
+    })
+    .select(ROW_COLUMNS)
+    .single();
+
+  if (error || !data) throw new Error("Жоба сақталмады.");
+  return fromRow(data as ProjectRow);
+}
+
+/** Loads one project owned by the signed-in user (RLS scoped). */
+export function useProject(id: string) {
+  const { user, loading: authLoading } = useAuth();
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (authLoading) return;
+    let active = true;
+    setLoading(true);
+    setError(null);
+
+    if (!user) {
+      const local = read().find((p) => p.id === id) ?? null;
+      if (!local) setError("Бұл жобаны көру үшін аккаунтқа кір.");
+      setProject(local);
+      setLoading(false);
+      return;
+    }
+
+    void supabase
+      .from("projects")
+      .select(ROW_COLUMNS)
+      .eq("id", id)
+      .maybeSingle()
+      .then(({ data, error: err }) => {
+        if (!active) return;
+        if (err) setError("Жоба жүктелмеді.");
+        else if (!data) setError("Жоба табылмады.");
+        else setProject(fromRow(data as ProjectRow));
+        setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [id, user, authLoading]);
+
+  return { project, loading, error };
 }

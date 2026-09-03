@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, Check, Sparkles, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ThinkingDots, SkeletonBlock } from "@/components/LoadingState";
 import { AiCore } from "@/components/AiCore";
-import { createProjectFromPrompt } from "@/lib/projects";
+import { createProjectFromBlueprint, createProjectFromPrompt } from "@/lib/projects";
 import { planAiTask } from "@/lib/ai-engine.functions";
 import type { AiTaskPlan } from "@/lib/ai-engine/types";
 import { AiEngineStatus, type EnginePhase } from "@/components/AiEngineStatus";
@@ -72,6 +72,24 @@ function BuilderPage() {
   const [execResult, setExecResult] = useState<AiExecutionResult | null>(null);
   const [execError, setExecError] = useState<string | null>(null);
   const [execBudget, setExecBudget] = useState<{ estimated: number; max: number } | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [createdId, setCreatedId] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const createProject = async () => {
+    if (!user || !execResult || creating || createdId) return;
+    setCreating(true);
+    try {
+      const project = await createProjectFromBlueprint(user.id, execResult.project, prompt.trim());
+      setCreatedId(project.id);
+      toast.success("Жоба сақталды");
+      void navigate({ to: "/projects/$projectId", params: { projectId: project.id } });
+    } catch {
+      toast.error("Жоба сақталмады. Қайта көр.");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
@@ -89,6 +107,7 @@ function BuilderPage() {
     setExecResult(null);
     setExecError(null);
     setExecBudget(null);
+    setCreatedId(null);
     setExecState(user ? "planning" : "idle");
     setPhase("analyzing");
     timers.current.push(setTimeout(() => setPhase((p) => (p === "analyzing" ? "planning" : p)), 700));
@@ -139,16 +158,18 @@ function BuilderPage() {
       setTimeout(
         () => {
           if (i === STAGES.length - 1) {
-            void createProjectFromPrompt(prompt, user?.id ?? null).then((project) => {
-              setProjectName(project.name);
+            if (user) {
+              setProjectName(prompt.trim().split(/[.\n]/)[0]?.slice(0, 46) || "Жаңа AI жоба");
               setDone(true);
               setStage(STAGES.length);
-              toast.success(
-                user
-                  ? "Жоба дайын — Projects бөлімінен қара"
-                  : "Жоба дайын. Сақтау үшін аккаунтқа кір.",
-              );
-            });
+            } else {
+              void createProjectFromPrompt(prompt, null).then((project) => {
+                setProjectName(project.name);
+                setDone(true);
+                setStage(STAGES.length);
+                toast.success("Жоба дайын. Сақтау үшін аккаунтқа кір.");
+              });
+            }
 
           } else {
             setStage(i + 1);
@@ -228,6 +249,30 @@ function BuilderPage() {
         error={execError}
         className="mt-4"
       />
+
+      {user && execResult ? (
+        <div className="glass animate-rise mt-4 flex flex-col gap-3 rounded-3xl p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold">Blueprint дайын — нақты жобаға айналдыр.</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Жоба Projects бөлімінде сақталады және кез келген уақытта ашылады.
+            </p>
+          </div>
+          <div className="flex shrink-0 gap-2">
+            {createdId ? (
+              <Button asChild variant="hero">
+                <Link to="/projects/$projectId" params={{ projectId: createdId }}>
+                  Жобаны ашу <ArrowRight />
+                </Link>
+              </Button>
+            ) : (
+              <Button variant="hero" onClick={() => void createProject()} disabled={creating}>
+                {creating ? "Сақталуда..." : "Жоба жасау"}
+              </Button>
+            )}
+          </div>
+        </div>
+      ) : null}
 
       {/* Generation state / preview */}
       {stage >= 0 && (
