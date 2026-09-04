@@ -48,7 +48,7 @@ export function TemplateCard({
       </div>
 
       <p className="mt-3 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-        {template.sections.join(" · ')").replace(" · ')", " · ").replace(/ · $/, "")}
+        {template.sections.join(" · ")}
       </p>
 
       <div className="mt-4 flex items-center justify-between gap-2">
