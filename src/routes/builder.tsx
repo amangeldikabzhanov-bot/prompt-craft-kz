@@ -83,7 +83,7 @@ function BuilderPage() {
       const project = await createProjectFromBlueprint(user.id, execResult.project, prompt.trim());
       setCreatedId(project.id);
       toast.success("Жоба сақталды");
-      void navigate({ to: "/projects/$projectId", params: { projectId: project.id } });
+      void navigate({ to: "/project/$projectId", params: { projectId: project.id } });
     } catch {
       toast.error("Жоба сақталмады. Қайта көр.");
     } finally {
@@ -261,7 +261,7 @@ function BuilderPage() {
           <div className="flex shrink-0 gap-2">
             {createdId ? (
               <Button asChild variant="hero">
-                <Link to="/projects/$projectId" params={{ projectId: createdId }}>
+                <Link to="/project/$projectId" params={{ projectId: createdId }}>
                   Жобаны ашу <ArrowRight />
                 </Link>
               </Button>
