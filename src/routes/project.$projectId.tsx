@@ -6,7 +6,7 @@ import { useProject } from "@/lib/projects";
 import type { ProjectStatus } from "@/components/ProjectCard";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/projects/$projectId")({
+export const Route = createFileRoute("/project/$projectId")({
   head: () => ({
     meta: [
       { title: "Жоба — жұмыс кеңістігі | VibeCoding KZ" },

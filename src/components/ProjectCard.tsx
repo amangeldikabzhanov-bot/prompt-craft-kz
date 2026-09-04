@@ -86,7 +86,7 @@ export function ProjectCard({ project, index = 0 }: { project: Project; index?: 
       </div>
 
       <Link
-        to="/projects/$projectId"
+        to="/project/$projectId"
         params={{ projectId: project.id }}
         className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface/50 px-3 py-1.5 text-xs font-medium transition-colors hover:border-primary/50 hover:text-primary-glow"
       >
