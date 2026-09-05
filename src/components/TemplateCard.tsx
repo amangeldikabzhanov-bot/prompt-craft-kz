@@ -53,8 +53,7 @@ export function TemplateCard({
         {template.sections.join(" · ")}
       </p>
 
-      <div className="mt-4 flex items-center gap-2" data-x="1"><span/></div>
-      <div className="mt-auto flex items-center justify-between gap-2">
+      <div className="mt-auto flex items-center justify-between gap-2 pt-4">
         <span className="truncate text-[11px] text-muted-foreground">
           {isPro ? "Premium құрылым" : locked ? "Тегін қолданыс бітті" : "1 рет тегін қолдану"}
         </span>
