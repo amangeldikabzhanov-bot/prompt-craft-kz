@@ -17,6 +17,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/builder")({
+  validateSearch: (search: Record<string, unknown>) => {
+    const out: { prompt?: string; template?: string } = {};
+    if (typeof search['prompt'] === "string" && search['prompt']) out.prompt = search['prompt'].slice(0, MAX);
+    if (typeof search['template'] === "string" && search['template']) out.template = search['template'];
+    return out;
+  },
   head: () => ({
     meta: [
       { title: "Builder — идеяңды жаз, AI жасасын | VibeCoding KZ" },
