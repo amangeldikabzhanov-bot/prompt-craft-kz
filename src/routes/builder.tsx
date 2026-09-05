@@ -15,6 +15,7 @@ import { executeAiTask } from "@/lib/ai-engine.functions";
 import type { AiExecutionResult } from "@/lib/ai-engine/types";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
+import { getTemplate } from "@/data/templates";
 
 export const Route = createFileRoute("/builder")({
   validateSearch: (search: Record<string, unknown>) => {
@@ -202,6 +203,20 @@ function BuilderPage() {
           Не жасағың келетінін қарапайым сөзбен жаз. Қалғанын Builder өзі шешеді.
         </p>
       </div>
+
+      {template ? (
+        <div className="glass animate-rise mt-8 flex flex-col gap-2 rounded-3xl p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold">Таңдалған шаблон: {template.name}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Бос құрылым: {template.sections.join(" · ")}. Мазмұнды AI-ға өзіңіз айтасыз.
+            </p>
+          </div>
+          <span className="glass shrink-0 rounded-full px-3 py-1.5 text-[11px] text-primary-glow">
+            {template.category}
+          </span>
+        </div>
+      ) : null}
 
       {/* Input */}
       <div className="animate-rise surface-card mt-10 rounded-4xl p-4 transition-shadow duration-300 focus-within:shadow-[var(--shadow-glow)] sm:p-6">
