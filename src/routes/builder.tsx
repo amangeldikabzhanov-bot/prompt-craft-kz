@@ -63,7 +63,9 @@ const STATUS_TEXT = [
 ];
 
 function BuilderPage() {
-  const [prompt, setPrompt] = useState("");
+  const search = Route.useSearch();
+  const template = getTemplate(search.template);
+  const [prompt, setPrompt] = useState(search.prompt ?? "");
   const [stage, setStage] = useState(-1);
   const [done, setDone] = useState(false);
   const [projectName, setProjectName] = useState("");
