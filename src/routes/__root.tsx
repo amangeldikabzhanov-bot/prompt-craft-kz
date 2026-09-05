@@ -128,7 +128,7 @@ function RootComponent() {
       <GlowBackground />
       <div className="flex min-h-screen flex-col">
         <Navbar />
-        <main className="flex-1 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] md:pb-12">
+        <main className="flex-1 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] lg:pb-12">
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <PageTransition>
             <Outlet />

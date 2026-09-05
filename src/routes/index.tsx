@@ -164,7 +164,7 @@ function Index() {
               Бастапқы құрылымды таңдаңыз да, қалғанын өзіңіз AI көмегімен толтырыңыз.
             </p>
           </div>
-          <span className="glass shrink-0 rounded-full px-3 py-1.5 text-xs text-muted-foreground">
+          <span className="glass w-fit shrink-0 rounded-full px-3 py-1.5 text-xs text-muted-foreground">
             {ready && freeUsed ? "Тегін қолданыс бітті" : "1 рет тегін қолдану"}
           </span>
         </div>

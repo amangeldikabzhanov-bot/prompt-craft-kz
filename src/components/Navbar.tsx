@@ -59,7 +59,7 @@ export function Navbar() {
   return (
     <>
       {/* Desktop / tablet */}
-      <header className="sticky top-0 z-40 hidden w-full border-b border-border/50 bg-background/60 backdrop-blur-xl md:block">
+      <header className="sticky top-0 z-40 hidden w-full border-b border-border/50 bg-background/60 backdrop-blur-xl lg:block">
         <nav className="mx-auto flex h-18 max-w-7xl items-center gap-6 px-6 py-3">
           <Link to="/" className="press group flex shrink-0 items-center gap-2.5">
             <span className="animate-pulse-glow grid size-9 place-items-center rounded-xl bg-[image:var(--gradient-primary)] text-primary-foreground">
@@ -123,7 +123,7 @@ export function Navbar() {
       </header>
 
       {/* Mobile top bar */}
-      <header className="sticky top-0 z-40 w-full border-b border-border/50 bg-background/75 backdrop-blur-xl md:hidden">
+      <header className="sticky top-0 z-40 w-full border-b border-border/50 bg-background/75 backdrop-blur-xl lg:hidden">
         <div className="flex h-14 items-center justify-between px-4">
           <Link to="/" className="press flex min-w-0 items-center gap-2">
             <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-[image:var(--gradient-primary)] text-primary-foreground">
@@ -150,7 +150,7 @@ export function Navbar() {
 
 export function MobileTabBar() {
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-3 pb-[calc(env(safe-area-inset-bottom)+0.65rem)] md:hidden">
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-3 pb-[calc(env(safe-area-inset-bottom)+0.65rem)] lg:hidden">
       <nav className="glass pointer-events-auto mx-auto max-w-md rounded-3xl shadow-[var(--shadow-card)]">
         <ul className="grid grid-cols-5">
           {NAV_ITEMS.map((item) => (
