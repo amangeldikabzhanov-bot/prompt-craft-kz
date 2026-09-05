@@ -22,7 +22,9 @@ export function TemplateCard({
       style={{ animationDelay: `${Math.min(index, 10) * 55}ms` }}
       className="animate-rise surface-card card-interactive group flex flex-col rounded-3xl p-4"
     >
-      <TemplatePreviewFrame kind={template.preview} />
+      <div className="h-[9.5rem] overflow-hidden sm:h-40">
+        <TemplatePreviewFrame kind={template.preview} />
+      </div>
 
       <div className="mt-5 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
         <div className="min-w-0">
@@ -51,7 +53,8 @@ export function TemplateCard({
         {template.sections.join(" · ")}
       </p>
 
-      <div className="mt-4 flex items-center justify-between gap-2">
+      <div className="mt-4 flex items-center gap-2" data-x="1"><span/></div>
+      <div className="mt-auto flex items-center justify-between gap-2">
         <span className="truncate text-[11px] text-muted-foreground">
           {isPro ? "Premium құрылым" : locked ? "Тегін қолданыс бітті" : "1 рет тегін қолдану"}
         </span>
