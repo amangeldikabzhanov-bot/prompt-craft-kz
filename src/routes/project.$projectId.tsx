@@ -42,6 +42,41 @@ const STATUS_STYLE: Record<ProjectStatus, string> = {
 function ProjectDetailPage() {
   const { projectId } = Route.useParams();
   const { project, loading, error } = useProject(projectId);
+  const { user } = useAuth();
+  const runExport = useServerFn(exportProjectZip);
+  const [exporting, setExporting] = useState(false);
+  const [exported, setExported] = useState(false);
+
+  async function handleExport() {
+    if (exporting || !user) return;
+    setExporting(true);
+    setExported(false);
+    try {
+      const res = await runExport({ data: { projectId } });
+      if (!res.ok) {
+        toast.error(res.message);
+        return;
+      }
+      const binary = atob(res.base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+      const url = URL.createObjectURL(new Blob([bytes], { type: "application/zip" }));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = res.fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      setExported(true);
+      toast.success("ZIP жүктелді");
+    } catch {
+      toast.error("ZIP жүктелмеді. Қайта көр.");
+    } finally {
+      setExporting(false);
+    }
+  }
+
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
