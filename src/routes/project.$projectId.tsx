@@ -117,7 +117,22 @@ function ProjectDetailPage() {
                 Жаңартылды: {project.updatedAtLabel || project.updatedAt}
               </span>
             </div>
+
+            {user ? (
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                <Button onClick={handleExport} disabled={exporting} size="sm" className="min-w-0">
+                  {exporting ? <Loader2 className="animate-spin" /> : <Download />}
+                  {exporting ? "Дайындалуда..." : "ZIP жүктеу"}
+                </Button>
+                {exported && !exporting ? (
+                  <span className="inline-flex items-center gap-1.5 text-[11px] text-success">
+                    <Check className="size-3.5" /> Жүктелді
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
           </div>
+
 
           {project.blueprint ? (
             <div className="surface-card animate-rise rounded-3xl p-5 sm:p-7">
