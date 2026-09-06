@@ -1,10 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, CalendarClock, Check, Layers, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, CalendarClock, Check, Download, Layers, Loader2, Sparkles } from "lucide-react";
+import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/LoadingState";
 import { useProject } from "@/lib/projects";
+import { useAuth } from "@/hooks/useAuth";
+import { exportProjectZip } from "@/lib/project-export.functions";
 import type { ProjectStatus } from "@/components/ProjectCard";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/project/$projectId")({
   head: () => ({
@@ -36,6 +42,41 @@ const STATUS_STYLE: Record<ProjectStatus, string> = {
 function ProjectDetailPage() {
   const { projectId } = Route.useParams();
   const { project, loading, error } = useProject(projectId);
+  const { user } = useAuth();
+  const runExport = useServerFn(exportProjectZip);
+  const [exporting, setExporting] = useState(false);
+  const [exported, setExported] = useState(false);
+
+  async function handleExport() {
+    if (exporting || !user) return;
+    setExporting(true);
+    setExported(false);
+    try {
+      const res = await runExport({ data: { projectId } });
+      if (!res.ok) {
+        toast.error(res.message);
+        return;
+      }
+      const binary = atob(res.base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+      const url = URL.createObjectURL(new Blob([bytes], { type: "application/zip" }));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = res.fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      setExported(true);
+      toast.success("ZIP жүктелді");
+    } catch {
+      toast.error("ZIP жүктелмеді. Қайта көр.");
+    } finally {
+      setExporting(false);
+    }
+  }
+
 
   return (
     <div className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
@@ -76,7 +117,22 @@ function ProjectDetailPage() {
                 Жаңартылды: {project.updatedAtLabel || project.updatedAt}
               </span>
             </div>
+
+            {user ? (
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                <Button onClick={handleExport} disabled={exporting} size="sm" className="min-w-0">
+                  {exporting ? <Loader2 className="animate-spin" /> : <Download />}
+                  {exporting ? "Дайындалуда..." : "ZIP жүктеу"}
+                </Button>
+                {exported && !exporting ? (
+                  <span className="inline-flex items-center gap-1.5 text-[11px] text-success">
+                    <Check className="size-3.5" /> Жүктелді
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
           </div>
+
 
           {project.blueprint ? (
             <div className="surface-card animate-rise rounded-3xl p-5 sm:p-7">
