@@ -1,10 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, CalendarClock, Check, Layers, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, CalendarClock, Check, Download, Layers, Loader2, Sparkles } from "lucide-react";
+import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/LoadingState";
 import { useProject } from "@/lib/projects";
+import { useAuth } from "@/hooks/useAuth";
+import { exportProjectZip } from "@/lib/project-export.functions";
 import type { ProjectStatus } from "@/components/ProjectCard";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/project/$projectId")({
   head: () => ({
