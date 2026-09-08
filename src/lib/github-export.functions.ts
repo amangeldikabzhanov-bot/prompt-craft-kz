@@ -44,7 +44,7 @@ export const startGitHubConnect = createServerFn({ method: "POST" })
       appUserId: context.userId,
       clientAPIKey: clientApiKey(),
       returnUrl,
-      connectionAPIKey: connectionAPIKey ?? undefined,
+      ...(connectionAPIKey ? { connectionAPIKey } : {}),
       credentialsConfiguration: { scopes: GITHUB_SCOPES },
     });
     return { authorizationUrl };
