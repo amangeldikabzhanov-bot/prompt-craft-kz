@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, CalendarClock, Check, Download, Layers, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, CalendarClock, Check, Download, Github, Layers, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/LoadingState";
+import { GitHubExportModal } from "@/components/GitHubExportModal";
 import { useProject } from "@/lib/projects";
 import { useAuth } from "@/hooks/useAuth";
 import { exportProjectZip } from "@/lib/project-export.functions";
