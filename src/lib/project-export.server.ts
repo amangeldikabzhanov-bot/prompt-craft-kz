@@ -207,6 +207,12 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #05070f; color
     ...pageFiles,
   };
 
+  return files;
+}
+
+/** Returns { fileName, bytes } for the project's zip archive. */
+export function buildProjectZip(project: ExportProjectInput) {
+  const files = buildProjectFiles(project);
   const zipInput: Record<string, Uint8Array> = {};
   for (const [path, content] of Object.entries(files)) {
     zipInput[path] = strToU8(content);
