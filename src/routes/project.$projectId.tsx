@@ -47,6 +47,7 @@ function ProjectDetailPage() {
   const runExport = useServerFn(exportProjectZip);
   const [exporting, setExporting] = useState(false);
   const [exported, setExported] = useState(false);
+  const [ghOpen, setGhOpen] = useState(false);
 
   async function handleExport() {
     if (exporting || !user) return;
@@ -124,6 +125,9 @@ function ProjectDetailPage() {
                 <Button onClick={handleExport} disabled={exporting} size="sm" className="min-w-0">
                   {exporting ? <Loader2 className="animate-spin" /> : <Download />}
                   {exporting ? "Дайындалуда..." : "ZIP жүктеу"}
+                </Button>
+                <Button onClick={() => setGhOpen(true)} variant="outline" size="sm" className="min-w-0">
+                  <Github /> GitHub
                 </Button>
                 {exported && !exporting ? (
                   <span className="inline-flex items-center gap-1.5 text-[11px] text-success">
