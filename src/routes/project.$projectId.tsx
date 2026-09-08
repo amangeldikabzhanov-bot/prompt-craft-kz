@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, CalendarClock, Check, Download, Layers, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, CalendarClock, Check, Download, Github, Layers, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { LoadingState } from "@/components/LoadingState";
+import { GitHubExportModal } from "@/components/GitHubExportModal";
 import { useProject } from "@/lib/projects";
 import { useAuth } from "@/hooks/useAuth";
 import { exportProjectZip } from "@/lib/project-export.functions";
@@ -46,6 +47,7 @@ function ProjectDetailPage() {
   const runExport = useServerFn(exportProjectZip);
   const [exporting, setExporting] = useState(false);
   const [exported, setExported] = useState(false);
+  const [ghOpen, setGhOpen] = useState(false);
 
   async function handleExport() {
     if (exporting || !user) return;
@@ -123,6 +125,9 @@ function ProjectDetailPage() {
                 <Button onClick={handleExport} disabled={exporting} size="sm" className="min-w-0">
                   {exporting ? <Loader2 className="animate-spin" /> : <Download />}
                   {exporting ? "Дайындалуда..." : "ZIP жүктеу"}
+                </Button>
+                <Button onClick={() => setGhOpen(true)} variant="outline" size="sm" className="min-w-0">
+                  <Github /> GitHub
                 </Button>
                 {exported && !exporting ? (
                   <span className="inline-flex items-center gap-1.5 text-[11px] text-success">
