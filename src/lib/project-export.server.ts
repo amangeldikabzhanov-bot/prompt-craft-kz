@@ -53,8 +53,17 @@ function pageComponentName(page: string, index: number): string {
   return ascii ? `${ascii[0]!.toUpperCase()}${ascii.slice(1)}` : `Page${index + 1}`;
 }
 
-/** Returns { fileName, bytes } for the project's zip archive. */
-export function buildProjectZip(project: ExportProjectInput) {
+export function sanitizeRepoName(name: string): string {
+  const cleaned = name
+    .normalize("NFKD")
+    .replace(/[^\p{L}\p{N}\-_.]/gu, "-")
+    .replace(/-+/g, "-")
+    .replace(/^[-.]+|[-.]+$/g, "");
+  return (cleaned || "vibecoding-project").slice(0, 90);
+}
+
+/** Returns the full text file map for the project scaffold. */
+export function buildProjectFiles(project: ExportProjectInput): Record<string, string> {
   const blueprint = readBlueprint(project.blueprint);
   const slug = slugAscii(project.name);
   const pages = blueprint?.pages.length ? blueprint.pages : ["Басты бет"];
