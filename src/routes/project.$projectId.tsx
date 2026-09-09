@@ -193,6 +193,15 @@ function ProjectDetailPage() {
           )}
         </div>
       )}
+
+      {user && project ? (
+        <GitHubExportModal
+          isOpen={ghOpen}
+          onClose={() => setGhOpen(false)}
+          projectId={projectId}
+          projectName={project.name}
+        />
+      ) : null}
     </div>
   );
 }
