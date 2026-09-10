@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Blocks, Compass, LayoutGrid, LogIn, Sparkles, Terminal } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { InspectorBadge } from "@/components/InspectorBadge";
 
 function AccountLink({ compact = false }: { compact?: boolean }) {
   const { user, loading } = useAuth();
