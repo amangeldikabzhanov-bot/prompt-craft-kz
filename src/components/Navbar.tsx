@@ -109,6 +109,7 @@ export function Navbar() {
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
+          <InspectorBadge />
           <AccountLink />
           <Link
             to="/builder"
@@ -135,6 +136,7 @@ export function Navbar() {
             </span>
           </Link>
           <div className="flex shrink-0 items-center gap-2">
+            <InspectorBadge compact />
             <AccountLink compact />
             <Link
               to="/builder"
