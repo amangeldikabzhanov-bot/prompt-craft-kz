@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Blocks, Compass, LayoutGrid, LogIn, Sparkles, Terminal } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { InspectorBadge } from "@/components/InspectorBadge";
 
 function AccountLink({ compact = false }: { compact?: boolean }) {
   const { user, loading } = useAuth();
@@ -108,6 +109,7 @@ export function Navbar() {
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
+          <InspectorBadge />
           <AccountLink />
           <Link
             to="/builder"
@@ -134,6 +136,7 @@ export function Navbar() {
             </span>
           </Link>
           <div className="flex shrink-0 items-center gap-2">
+            <InspectorBadge compact />
             <AccountLink compact />
             <Link
               to="/builder"

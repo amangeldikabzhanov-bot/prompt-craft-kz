@@ -14,6 +14,7 @@ import { AiExecutionPanel, type ExecPhase } from "@/components/AiExecutionPanel"
 import { executeAiTask } from "@/lib/ai-engine.functions";
 import type { AiExecutionResult } from "@/lib/ai-engine/types";
 import { useAuth } from "@/hooks/useAuth";
+import { useInspector } from "@/hooks/useInspector";
 import { cn } from "@/lib/utils";
 import { getTemplate } from "@/data/templates";
 
